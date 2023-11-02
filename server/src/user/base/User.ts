@@ -11,11 +11,21 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { IsDate, IsString, IsOptional } from "class-validator";
+import {
+  IsDate,
+  IsOptional,
+  IsString,
+  IsBoolean,
+  IsInt,
+  ValidateNested,
+  IsEnum,
+} from "class-validator";
 import { Type } from "class-transformer";
+import { Role } from "../../role/base/Role";
 import { IsJSONValue } from "@app/custom-validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { JsonValue } from "type-fest";
+import { EnumUserStatus } from "./EnumUserStatus";
 
 @ObjectType()
 class User {
@@ -26,6 +36,33 @@ class User {
   @Type(() => Date)
   @Field(() => Date)
   createdAt!: Date;
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsDate()
+  @Type(() => Date)
+  @IsOptional()
+  @Field(() => Date, {
+    nullable: true,
+  })
+  deletedAt!: Date | null;
+
+  @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @Field(() => String)
+  email!: string;
+
+  @ApiProperty({
+    required: true,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @Field(() => Boolean)
+  emailVerified!: boolean;
 
   @ApiProperty({
     required: false,
@@ -58,11 +95,49 @@ class User {
   lastName!: string | null;
 
   @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  phone!: number | null;
+
+  @ApiProperty({
+    required: true,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @Field(() => Boolean)
+  phoneVerified!: boolean;
+
+  @ApiProperty({
+    required: false,
+    type: () => Role,
+  })
+  @ValidateNested()
+  @Type(() => Role)
+  @IsOptional()
+  role?: Role | null;
+
+  @ApiProperty({
     required: true,
   })
   @IsJSONValue()
   @Field(() => GraphQLJSON)
   roles!: JsonValue;
+
+  @ApiProperty({
+    required: true,
+    enum: EnumUserStatus,
+  })
+  @IsEnum(EnumUserStatus)
+  @Field(() => EnumUserStatus, {
+    nullable: true,
+  })
+  status?: "Active" | "Inactive";
 
   @ApiProperty({
     required: true,

@@ -11,8 +11,10 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { IsString, IsOptional, IsEnum } from "class-validator";
-import { EnumRoleStatus } from "./EnumRoleStatus";
+import { IsString, IsOptional, IsInt, ValidateNested } from "class-validator";
+import { PermissionUpdateManyWithoutRolesInput } from "./PermissionUpdateManyWithoutRolesInput";
+import { Type } from "class-transformer";
+import { UserUpdateManyWithoutRolesInput } from "./UserUpdateManyWithoutRolesInput";
 
 @InputType()
 class RoleUpdateInput {
@@ -25,7 +27,18 @@ class RoleUpdateInput {
   @Field(() => String, {
     nullable: true,
   })
-  key?: string;
+  description?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  level?: number | null;
 
   @ApiProperty({
     required: false,
@@ -40,14 +53,27 @@ class RoleUpdateInput {
 
   @ApiProperty({
     required: false,
-    enum: EnumRoleStatus,
+    type: () => PermissionUpdateManyWithoutRolesInput,
   })
-  @IsEnum(EnumRoleStatus)
+  @ValidateNested()
+  @Type(() => PermissionUpdateManyWithoutRolesInput)
   @IsOptional()
-  @Field(() => EnumRoleStatus, {
+  @Field(() => PermissionUpdateManyWithoutRolesInput, {
     nullable: true,
   })
-  status?: "Active" | null;
+  permission?: PermissionUpdateManyWithoutRolesInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => UserUpdateManyWithoutRolesInput,
+  })
+  @ValidateNested()
+  @Type(() => UserUpdateManyWithoutRolesInput)
+  @IsOptional()
+  @Field(() => UserUpdateManyWithoutRolesInput, {
+    nullable: true,
+  })
+  users?: UserUpdateManyWithoutRolesInput;
 }
 
 export { RoleUpdateInput as RoleUpdateInput };

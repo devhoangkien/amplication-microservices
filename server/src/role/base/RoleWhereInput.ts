@@ -11,14 +11,27 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { StringFilter } from "../../util/StringFilter";
-import { Type } from "class-transformer";
-import { IsOptional, IsEnum } from "class-validator";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
-import { EnumRoleStatus } from "./EnumRoleStatus";
+import { Type } from "class-transformer";
+import { IsOptional, ValidateNested } from "class-validator";
+import { StringFilter } from "../../util/StringFilter";
+import { IntNullableFilter } from "../../util/IntNullableFilter";
+import { PermissionListRelationFilter } from "../../permission/base/PermissionListRelationFilter";
+import { UserListRelationFilter } from "../../user/base/UserListRelationFilter";
 
 @InputType()
 class RoleWhereInput {
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  description?: StringNullableFilter;
+
   @ApiProperty({
     required: false,
     type: StringFilter,
@@ -32,14 +45,14 @@ class RoleWhereInput {
 
   @ApiProperty({
     required: false,
-    type: StringFilter,
+    type: IntNullableFilter,
   })
-  @Type(() => StringFilter)
+  @Type(() => IntNullableFilter)
   @IsOptional()
-  @Field(() => StringFilter, {
+  @Field(() => IntNullableFilter, {
     nullable: true,
   })
-  key?: StringFilter;
+  level?: IntNullableFilter;
 
   @ApiProperty({
     required: false,
@@ -54,14 +67,27 @@ class RoleWhereInput {
 
   @ApiProperty({
     required: false,
-    enum: EnumRoleStatus,
+    type: () => PermissionListRelationFilter,
   })
-  @IsEnum(EnumRoleStatus)
+  @ValidateNested()
+  @Type(() => PermissionListRelationFilter)
   @IsOptional()
-  @Field(() => EnumRoleStatus, {
+  @Field(() => PermissionListRelationFilter, {
     nullable: true,
   })
-  status?: "Active";
+  permission?: PermissionListRelationFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => UserListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => UserListRelationFilter)
+  @IsOptional()
+  @Field(() => UserListRelationFilter, {
+    nullable: true,
+  })
+  users?: UserListRelationFilter;
 }
 
 export { RoleWhereInput as RoleWhereInput };

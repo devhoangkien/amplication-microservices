@@ -26,6 +26,10 @@ import { RoleCountArgs } from "./RoleCountArgs";
 import { RoleFindManyArgs } from "./RoleFindManyArgs";
 import { RoleFindUniqueArgs } from "./RoleFindUniqueArgs";
 import { Role } from "./Role";
+import { PermissionFindManyArgs } from "../../permission/base/PermissionFindManyArgs";
+import { Permission } from "../../permission/base/Permission";
+import { UserFindManyArgs } from "../../user/base/UserFindManyArgs";
+import { User } from "../../user/base/User";
 import { RoleService } from "../role.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => Role)
@@ -130,5 +134,45 @@ export class RoleResolverBase {
       }
       throw error;
     }
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [Permission], { name: "permission" })
+  @nestAccessControl.UseRoles({
+    resource: "Permission",
+    action: "read",
+    possession: "any",
+  })
+  async resolveFieldPermission(
+    @graphql.Parent() parent: Role,
+    @graphql.Args() args: PermissionFindManyArgs
+  ): Promise<Permission[]> {
+    const results = await this.service.findPermission(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [User], { name: "users" })
+  @nestAccessControl.UseRoles({
+    resource: "User",
+    action: "read",
+    possession: "any",
+  })
+  async resolveFieldUsers(
+    @graphql.Parent() parent: Role,
+    @graphql.Args() args: UserFindManyArgs
+  ): Promise<User[]> {
+    const results = await this.service.findUsers(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
   }
 }

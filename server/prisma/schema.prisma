@@ -8,25 +8,78 @@ generator client {
 }
 
 model User {
+  createdAt     DateTime       @default(now())
+  deletedAt     DateTime?
+  email         String
+  emailVerified Boolean
+  firstName     String?
+  id            String         @id @default(cuid())
+  lastName      String?
+  password      String
+  phone         Int?
+  phoneVerified Boolean
+  role          Role?          @relation(fields: [roleId], references: [id])
+  roleId        String?
+  roles         Json
+  status        EnumUserStatus
+  updatedAt     DateTime       @updatedAt
+  username      String         @unique
+}
+
+model Category {
+  categories   Category?  @relation(name: "categories", fields: [categoriesId], references: [id])
+  categoriesId String?
+  createdAt    DateTime   @default(now())
+  id           String     @id @default(cuid())
+  key          String?
+  name         String?
+  parentId     Category[] @relation(name: "categories")
+  updatedAt    DateTime   @updatedAt
+}
+
+model Tag {
   createdAt DateTime @default(now())
-  firstName String?
   id        String   @id @default(cuid())
-  lastName  String?
-  password  String
-  roles     Json
+  key       String?  @unique
+  name      String?
   updatedAt DateTime @updatedAt
-  username  String   @unique
 }
 
 model Role {
-  createdAt DateTime        @default(now())
-  id        String          @id @default(cuid())
-  key       String          @unique
-  name      String?
-  status    EnumRoleStatus?
-  updatedAt DateTime        @updatedAt
+  createdAt   DateTime     @default(now())
+  description String?
+  id          String       @id @default(cuid())
+  level       Int?
+  name        String?
+  permission  Permission[]
+  updatedAt   DateTime     @updatedAt
+  users       User[]
 }
 
-enum EnumRoleStatus {
+model Permission {
+  action     String
+  conditions Json?
+  createdAt  DateTime @default(now())
+  id         String   @id @default(cuid())
+  inverted   Boolean?
+  reason     String?
+  roles      Role[]
+  subject    String
+  updatedAt  DateTime @updatedAt
+}
+
+model Session {
+  accessToken  String
+  createdAt    DateTime  @default(now())
+  deletedAt    DateTime?
+  deviceId     String
+  id           String    @id @default(cuid())
+  ipAddress    String?
+  refreshToken String
+  updatedAt    DateTime  @updatedAt
+}
+
+enum EnumUserStatus {
   Active
+  Inactive
 }

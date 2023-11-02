@@ -2,7 +2,11 @@ import { Module } from "@nestjs/common";
 import { CacheModule } from "@nestjs/cache-manager";
 import { redisStore } from "cache-manager-ioredis-yet";
 import { UserModule } from "./user/user.module";
+import { CategoryModule } from "./category/category.module";
+import { TagModule } from "./tag/tag.module";
 import { RoleModule } from "./role/role.module";
+import { PermissionModule } from "./permission/permission.module";
+import { SessionModule } from "./session/session.module";
 import { HealthModule } from "./health/health.module";
 import { PrismaModule } from "./prisma/prisma.module";
 import { SecretsManagerModule } from "./providers/secrets/secretsManager.module";
@@ -21,7 +25,11 @@ import { AuthModule } from "./auth/auth.module";
     ACLModule,
     AuthModule,
     UserModule,
+    CategoryModule,
+    TagModule,
     RoleModule,
+    PermissionModule,
+    SessionModule,
     HealthModule,
     PrismaModule,
     SecretsManagerModule,

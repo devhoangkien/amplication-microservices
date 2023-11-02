@@ -11,9 +11,16 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { IsDate, IsString, IsOptional, IsEnum } from "class-validator";
+import {
+  IsDate,
+  IsString,
+  IsOptional,
+  IsInt,
+  ValidateNested,
+} from "class-validator";
 import { Type } from "class-transformer";
-import { EnumRoleStatus } from "./EnumRoleStatus";
+import { Permission } from "../../permission/base/Permission";
+import { User } from "../../user/base/User";
 
 @ObjectType()
 class Role {
@@ -26,6 +33,17 @@ class Role {
   createdAt!: Date;
 
   @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  description!: string | null;
+
+  @ApiProperty({
     required: true,
     type: String,
   })
@@ -34,12 +52,15 @@ class Role {
   id!: string;
 
   @ApiProperty({
-    required: true,
-    type: String,
+    required: false,
+    type: Number,
   })
-  @IsString()
-  @Field(() => String)
-  key!: string;
+  @IsInt()
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  level!: number | null;
 
   @ApiProperty({
     required: false,
@@ -54,14 +75,12 @@ class Role {
 
   @ApiProperty({
     required: false,
-    enum: EnumRoleStatus,
+    type: () => [Permission],
   })
-  @IsEnum(EnumRoleStatus)
+  @ValidateNested()
+  @Type(() => Permission)
   @IsOptional()
-  @Field(() => EnumRoleStatus, {
-    nullable: true,
-  })
-  status?: "Active" | null;
+  permission?: Array<Permission>;
 
   @ApiProperty({
     required: true,
@@ -70,6 +89,15 @@ class Role {
   @Type(() => Date)
   @Field(() => Date)
   updatedAt!: Date;
+
+  @ApiProperty({
+    required: false,
+    type: () => [User],
+  })
+  @ValidateNested()
+  @Type(() => User)
+  @IsOptional()
+  users?: Array<User>;
 }
 
 export { Role as Role };

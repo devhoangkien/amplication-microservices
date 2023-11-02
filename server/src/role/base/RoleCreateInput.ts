@@ -11,18 +11,34 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { IsString, IsOptional, IsEnum } from "class-validator";
-import { EnumRoleStatus } from "./EnumRoleStatus";
+import { IsString, IsOptional, IsInt, ValidateNested } from "class-validator";
+import { PermissionCreateNestedManyWithoutRolesInput } from "./PermissionCreateNestedManyWithoutRolesInput";
+import { Type } from "class-transformer";
+import { UserCreateNestedManyWithoutRolesInput } from "./UserCreateNestedManyWithoutRolesInput";
 
 @InputType()
 class RoleCreateInput {
   @ApiProperty({
-    required: true,
+    required: false,
     type: String,
   })
   @IsString()
-  @Field(() => String)
-  key!: string;
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  description?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: Number,
+  })
+  @IsInt()
+  @IsOptional()
+  @Field(() => Number, {
+    nullable: true,
+  })
+  level?: number | null;
 
   @ApiProperty({
     required: false,
@@ -37,14 +53,27 @@ class RoleCreateInput {
 
   @ApiProperty({
     required: false,
-    enum: EnumRoleStatus,
+    type: () => PermissionCreateNestedManyWithoutRolesInput,
   })
-  @IsEnum(EnumRoleStatus)
+  @ValidateNested()
+  @Type(() => PermissionCreateNestedManyWithoutRolesInput)
   @IsOptional()
-  @Field(() => EnumRoleStatus, {
+  @Field(() => PermissionCreateNestedManyWithoutRolesInput, {
     nullable: true,
   })
-  status?: "Active" | null;
+  permission?: PermissionCreateNestedManyWithoutRolesInput;
+
+  @ApiProperty({
+    required: false,
+    type: () => UserCreateNestedManyWithoutRolesInput,
+  })
+  @ValidateNested()
+  @Type(() => UserCreateNestedManyWithoutRolesInput)
+  @IsOptional()
+  @Field(() => UserCreateNestedManyWithoutRolesInput, {
+    nullable: true,
+  })
+  users?: UserCreateNestedManyWithoutRolesInput;
 }
 
 export { RoleCreateInput as RoleCreateInput };
